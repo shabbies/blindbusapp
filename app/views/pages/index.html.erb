@@ -1,0 +1,284 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+		<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+		<script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
+
+
+		<style>
+			#mainDiv {
+    			margin-left: 35px;
+    			margin-right: 35px;
+    			text-align: center;
+			}
+
+			#instructionsID ul {
+				display:table; 
+				margin:0 auto;
+			}
+
+			audio {
+				opacity: 0.1; /* This is to make the audio tag transparent/invisible */
+			}
+
+			#start_btn {
+				height: 1000px;
+				width: 800px;
+			}
+
+			#neutral_btn {
+				height: 1000px;
+				width: 800px;
+			}
+
+			#english_btn {
+				height: 1000px;
+				width: 800px;
+			}
+
+			#mandarin_btn {
+				height: 1000px;
+				width: 800px;
+			}
+
+		</style>
+	</head>
+	<!--<body onclick="trackNumClick()">-->
+	<body onclick="trackNumClick()">
+
+		<title>Blind Man App</title>
+		
+		<div id="mainDiv">
+			<div class="row">
+				<div class="page-header col-md-12">
+
+					<!-- <audio controls loop autoplay id="audio-player"> -->
+					<audio controls loop id="audio-player">
+						<!-- change this to suit the occassion-->
+					  <source src="assets/Full_Language_Selection.mp3" type="audio/mpeg">
+					  Your browser does not support the audio element.
+					</audio>
+
+					<!-- This is for english -->
+					<audio controls id="english-audio-player">
+					</audio>
+
+					<!-- This is for mandarin -->
+					<audio controls id="mandarin-audio-player">
+					</audio>
+
+					<h1>Language Selection <small><i>in process...</i></small></h1>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-12" id="instructionsID" >
+					While listening to the Audio Guide, the user is to tap anywhere on the screen to indicate his/her language preference.
+					<ul class="list-group">
+						<li class="list-group-item">Tap <b>once</b>, for English</li>
+						<li class="list-group-item">Tap <b>twice</b>, for Mandarin</li>
+					</ul>
+				</div>
+			</div>
+
+			<br/>
+
+			<div class="row">
+				<div class="btn-group" role="group">
+				  <button type="button" class="btn btn-info col-md-12" id="start_btn">
+				  	<font size="8">TAP TO START</font></button>
+			  	<button type="button" class="btn btn-info col-md-12" id="neutral_btn">
+				  	<font size="8">TAP TO START</font></button>
+			  	<button type="button" class="btn btn-primary col-md-12" id="english_btn">
+				  	<font size="8">English</font></button>
+			  	<button type="button" class="btn btn-primary col-md-12" id="mandarin_btn">
+				  	<font size="8">Mandarin</font></button>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-12 numberOfTaps">
+					<b><font size="6">Selected Language <br/><u><span class="tapValue"><font color="red">-</font></span></u></font></b>
+				</div>
+			</div>
+
+		</div>
+		
+		<%= form_tag(new_pages_path, :method=>'get', :id => "language_form" :hidden => true) do %>
+		 	<p>
+		   	<%= text_field_tag "language" %>
+		 	</p>
+		 	<p>
+		   	<%= submit_tag 'Submit' %>
+		 	</p>
+		<% end %>
+
+	</body>
+</html>
+
+<script type="text/javascript">
+
+	//global variable
+	click = 0;
+	mobile_usage = false;
+	tap_list = ['-', '-', 'English', 'Mandarin'];
+	var timeout = 0;
+
+	// enable vibration support
+	navigator.vibrate = navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate;
+
+	$(document).ready(function () {
+		$('#neutral_btn').hide();
+		$('#english_btn').hide();
+		$('#mandarin_btn').hide();
+		
+		//once the app is launched, the user will feel a vibration, which will trigger the user to tap the screen once
+		var start_vibrate = setTimeout(function()
+						    {
+				        		if (navigator.vibrate) {
+								    navigator.vibrate(1000);
+								}
+						    }, 2000);
+		/*
+		//this part is to store the data into firebase
+		var myDataRef = new Firebase('https://resplendent-heat-1005.firebaseio.com/');
+		var name = "User1";
+      	var text = "Happy Birthday";
+      	myDataRef.set({name: name, text: text});
+      	//myDataRef.push({name: name, text: text}); to append to list
+		myDataRef.on('child_added', function(snapshot) {
+			var message = snapshot.val();
+			//displayChatMessage(message.name, message.text); this is a created method to display the chat message
+		}); */
+
+	});
+
+
+	$(window).on("touchstart", function(ev) {
+		mobile_usage = true;
+	    //this is to reset the selection
+		if(click == 3) {
+			click = 1;
+		}
+		click = click + 1;
+		$('.numberOfTaps .tapValue').html('<font color="red">' + tap_list[click] + '</font>');
+
+			if(tap_list[click] != "-") {
+				stopAudio();
+				
+				if(tap_list[click] == 'English') {
+					$('#start_btn').hide();
+					$('#neutral_btn').hide();
+					$('#english_btn').show();
+					$('#mandarin_btn').hide();
+					//playEnglishAudio();
+				} else {
+					$('#start_btn').hide();
+					$('#neutral_btn').hide();
+					$('#english_btn').hide();
+					$('#mandarin_btn').show();
+					//playMandarinAudio();
+				}
+				
+				clearTimeout(timeout);
+				timeout = setTimeout(function()
+			    {
+			        window.location.replace("/pages/bus_number?selected_language=" + tap_list[click]);
+			        
+			    }, 2500);
+			}//end if tap list is not -
+	});
+
+
+	//count the number of times the user taps the screen (for language selection)
+	function trackNumClick() {
+		if(!mobile_usage) {
+
+			//this is to reset the selection
+			if(click == 3) {
+				click = 1;
+			}
+			click = click + 1;
+			$('.numberOfTaps .tapValue').html('<font color="red">' + tap_list[click] + '</font>');
+
+			if(tap_list[click] != "-") {
+				stopAudio();
+				
+				if(tap_list[click] == 'English') {
+					$('#start_btn').hide();
+					$('#neutral_btn').hide();
+					$('#english_btn').show();
+					$('#mandarin_btn').hide();
+					//playEnglishAudio();
+				} else {
+					$('#start_btn').hide();
+					$('#neutral_btn').hide();
+					$('#english_btn').hide();
+					$('#mandarin_btn').show();
+					//playMandarinAudio();
+				}
+				$("#language").val(tap_list[click]);
+				clearTimeout(timeout);
+				$("#language_form").submit();
+			}//end if tap list is not -
+
+		}//end if mobile_usage
+
+	}//end trackNumClick
+
+
+	$('#start_btn').click(function() {
+		var audioPlayer = document.getElementById('audio-player');
+    	audioPlayer.play();
+    	$('#start_btn').hide();
+    	$('#neutral_btn').show();
+	});
+
+	function stopAudio() {
+	    var audioPlayer = document.getElementById('audio-player');
+	    audioPlayer.pause();
+	    //audioPlayer.currentTime = 0;
+	}//stopAudio()
+
+	$('#neutral_btn').click(function() {
+		$.each($('audio'), function () {
+    		this.pause();
+    		this.currentTime = 0; // Reset time
+		});
+
+		$('#mandarin-audio-player').html('<source src="assets/Mandarin.mp3" type="audio/mpeg"> Your browser does not support the audio element.');
+
+		var audioPlayer = document.getElementById('mandarin-audio-player');
+		audioPlayer.play();
+	});// end play english audio
+
+	$('#mandarin_btn').click(function() {
+		$.each($('audio'), function () {
+    		this.pause();
+    		this.currentTime = 0; // Reset time
+		});
+
+		$('#mandarin-audio-player').html('<source src="assets/Mandarin.mp3" type="audio/mpeg"> Your browser does not support the audio element.');
+
+		var audioPlayer = document.getElementById('mandarin-audio-player');
+		audioPlayer.play();
+	});// end play english audio
+
+	$('#english_btn').click(function() {
+		$.each($('audio'), function () {
+    		this.pause();
+    		this.currentTime = 0; // Reset time
+		});
+
+
+		$('#english-audio-player').html('<source src="assets/English.mp3" type="audio/mpeg"> Your browser does not support the audio element.');
+
+		var audioPlayer = document.getElementById('english-audio-player');
+		audioPlayer.play();
+	});// end play mandarin audio
+
+
+
+
+</script>

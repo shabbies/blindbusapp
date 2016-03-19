@@ -1,0 +1,142 @@
+<html>
+	<head>		
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+		<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+		<script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
+
+		<style>
+			#mainDiv {
+    			margin-left: 35px;
+    			margin-right: 35px;
+    			text-align: center;
+			}
+
+			#instructionsID ul {
+				display:table; 
+				margin:0 auto;
+			}
+
+			#audio-player {
+				opacity: 0.1; /* This is to make the audio tag transparent/invisible */
+			}
+
+			.btn-big {
+				height: 1000px;
+				width: 800px;
+			}
+		</style>
+	</head>
+	<!--<body onclick="trackNumClick()">-->
+	<body>
+
+		<title>Bus Selection</title>
+		
+		<div id="mainDiv">
+			<div class="row">
+				<div class="page-header col-md-12">
+
+					<audio controls id="audio-player">
+						<!-- change this to suit the occassion-->
+					  	<!-- based on index.html selection, javascript will manipulate this html portion-->
+					</audio>
+
+					<h1>Requesting for Bus Number</h1>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-12" id="instructionsID" >
+					After the phone has vibrated, the user has to verbalize the bus number he/she wants to board.
+				</div>
+			</div>
+
+			<br/>
+
+			<div class="row">
+				<div class="btn-group" role="group">
+				  <button type="button" class="btn btn-info col-md-12 btn-big" id="start_btn">
+				  	<font size="8">TAP TO START</font></button>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="btn-group" role="group">
+				  <button type="button" class="btn btn-danger col-md-12 btn-big" id="upload_voice">
+				  	<font size="8">TAP HERE TO SPEAK</font></button>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-12">
+					<%= form_tag(pages_path, :method=>'post', :multipart => true, id: "speech_form", hidden: true) do %>
+				   	<%= file_field_tag "attachment", accept: 'audio/*', capture: true, id: "fileupload" %>
+				   	<%= submit_tag 'Submit', hidden: true%>
+					<% end %>
+				</div>
+			</div>
+
+
+			<div class="row">
+				<div class="col-md-12">
+					<p class="blinking"><font color="red" size="5"><span id="listen_input"> Listening for input ... </span></font></p>
+					<b><font size="6">Bus Number <br/><u><span class="tapValue"><font color="red">-</font></span></u></font></b>
+				</div>
+			</div>
+
+		</div>
+	</body>
+</html>
+
+<script>
+
+	// enable vibration support
+	navigator.vibrate = navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate;
+
+	$(document).ready(function () {
+
+
+		$('#listen_input').hide(); //this will only show when system is ready to listen for input
+
+		//this will return selected_language=English/Mandarin 
+		url_params = window.location.search.substr(1).split('=');
+		selected_language = url_params[2];
+
+		$('#audio-player').html('<source src="../assets/Bus_Number_' + selected_language + '.mp3" type="audio/mpeg"> Your browser does not support the audio element.');
+
+
+		//once the app is launched, the user will feel a vibration, which will trigger the user to tap the screen once. After
+		// tapping the screen, the audio-player will be played to request for bus number
+		if (navigator.vibrate) {
+		    navigator.vibrate(1000);
+		} //end navigator vibrate
+    
+
+		function blinker() {
+			$('.blinking').fadeOut(300);
+			$('.blinking').fadeIn(300);
+		}
+		setInterval(blinker, 1000);
+
+
+		$('#start_btn').click(function() {
+			var audioPlayer = document.getElementById('audio-player');
+	    	audioPlayer.play();
+	    	$('#start_btn').hide();
+	    	//$('#listen_input').show();
+		});
+
+		$("#upload_voice").click(function() {
+			$("#fileupload").click();
+		});
+
+		$("#fileupload").change(function(){
+			$("#speech_form").submit();
+		});	
+
+
+	});
+
+
+
+</script>
