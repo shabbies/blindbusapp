@@ -39,6 +39,7 @@
 					<audio controls id="audio-player">
 						<!-- change this to suit the occassion-->
 					  	<!-- based on index.html selection, javascript will manipulate this html portion-->
+					  	<source id="audio-player-source" src="<%= asset_path('Bus_Number_English.mp3') %>" type="audio/mpeg">
 					</audio>
 
 					<h1>Requesting for Bus Number</h1>
@@ -102,8 +103,9 @@
 		url_params = window.location.search.substr(1).split('=');
 		selected_language = url_params[2];
 
-		$('#audio-player').html('<source src="../assets/Bus_Number_' + selected_language + '.mp3" type="audio/mpeg"> Your browser does not support the audio element.');
-
+		if (selected_language == "Mandarin"){
+			$("#audio-player-source").attr("src", "<%= asset_path('Bus_Number_Mandarin.mp3') %>");
+		}
 
 		//once the app is launched, the user will feel a vibration, which will trigger the user to tap the screen once. After
 		// tapping the screen, the audio-player will be played to request for bus number
