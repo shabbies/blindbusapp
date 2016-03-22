@@ -36,7 +36,7 @@ class PagesController < ApplicationController
 		uri = URI.parse("https://stream.watsonplatform.net/authorization/api/v1/token?url=https://stream.watsonplatform.net/speech-to-text/api")
 		Net::HTTP.start(uri.host, uri.port,:use_ssl => uri.scheme == 'https') do |http|
 		    request = Net::HTTP::Get.new(uri)
-		    request.basic_auth '8dfa8734-724f-4c40-862d-df4c99ae32db', 'WoAcWHLJysxn'
+		    request.basic_auth '171557d1-a33e-4f06-8d98-f1bee958b8b2', '3VPF0oYoiPF7'
 		    token = http.request(request)
 		end
 
