@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>TODO supply a </title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyAR1vamnfgS8CpNgUoBusEAkFkjfT634JY"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+        <%= stylesheet_path "style"%>
+
+        <script>
+        var map;
+        var service;
+        var marker;
+        var pos;
+        var infowindow;
+        var geocoder;
+        var markersArray = new Array();
+        var gmarkers = [];
+        var hasBoarded = false;
+        var shakeDetected = false;
+        var serviceNo, stopID, sequenceNo, busStopName;
+
+        function initialize() {
+            geocoder = new google.maps.Geocoder();
+            var mapOptions = {
+                zoom: 17,
+                mapTypeId: google.maps.MapTypeId.ROADMAP,
+                panControl: false,
+                streetViewControl: false,
+                mapTypeControl: false
+            };
+
+            map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+
+            callGeolocation();
+            /*if (navigator.geolocation) {
+                    navigator.geolocation.watchPosition(function(position) {
+                        var lat = position.coords.latitude;
+                        var lng = position.coords.longitude;
+                        var myLocation = new google.maps.LatLng(lat, lng);
+                        geocoder.geocode({'latLng': myLocation}, function(results, status) {
+                            if (status === google.maps.GeocoderStatus.OK) {
+                                if (results[1]) {
+                                    removeMarkers();
+                                    map.setZoom(18);
+                                    marker = new google.maps.Marker({
+                                        position: myLocation,
+                                        draggable: false,
+                                        //animation: google.maps.Animation.DROP,
+                                        map: map
+                                    });
+                                    gmarkers.push(marker);
+                                } else {
+                                    alert('No results found');
+                                }
+                            }
+                        });
+                        pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+
+                        var request = {
+                            location: pos,
+                            radius: 150,
+                            types: ['bus_station']
+                        };
+
+                        map.setCenter(pos);
+
+                        infowindow = new google.maps.InfoWindow();
+                        var service = new google.maps.places.PlacesService(map);
+                        service.nearbySearch(request, callback);
+                    }, function() {
+                        handleNoGeolocation(true);
+                    });
+                } else {
+                    handleNoGeolocation(false);
+                } */
+            
+            //HTML5 geolocation - throw into function
+            function callGeolocation() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.watchPosition(function(position) {
+                        var lat = position.coords.latitude;
+                        var lng = position.coords.longitude;
+                        var myLocation = new google.maps.LatLng(lat, lng);
+                        geocoder.geocode({'latLng': myLocation}, function(results, status) {
+                            if (status === google.maps.GeocoderStatus.OK) {
+                                if (results[1]) {
+                                    removeMarkers();
+                                    map.setZoom(18);
+                                    marker = new google.maps.Marker({
+                                        position: myLocation,
+                                        draggable: false,
+                                        //animation: google.maps.Animation.DROP,
+                                        map: map
+                                    });
+                                    gmarkers.push(marker);
+                                } else {
+                                    alert('No results found');
+                                }
+                            }
+                        });
+                        pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+
+                        var request = {
+                            location: pos,
+                            radius: 150,
+                            types: ['bus_station']
+                        };
+
+                        map.setCenter(pos);
+
+                        infowindow = new google.maps.InfoWindow();
+                        var service = new google.maps.places.PlacesService(map);
+                        
+                        service.nearbySearch(request, callback);
+                    }, function() {
+                        handleNoGeolocation(true);
+                    });
+                } else {
+                    handleNoGeolocation(false);
+                }
+            }
+
+            function callback(results, status) {
+                if (status === google.maps.places.PlacesServiceStatus.OK) {
+                    //for (var i = 0; i < results.length; i++) {
+                        createMarker(results[i]);
+                    //}
+                }
+            }
+
+            function removeMarkers() {
+                for (i = 0; i < gmarkers.length; i++) {
+                    gmarkers[i].setMap(null);
+                }
+            }
+
+            function createMarker(place) {
+                if (! hasBoarded) {
+                    // hard code to SMU SOA bus stop for testing
+                    getBusArrival('ChIJeT0RdqMZ2jERRobPHBNqyPM');
+                    //getBusArrival(place.place_id);
+                }
+
+                var image = '<%= image_path("nearestbuses.png") %>';
+                var marker = new google.maps.Marker({
+                    map: map,
+                    position: place.geometry.location,
+                    icon: image
+                });
+
+                google.maps.event.addListener(marker, 'click', function() {
+                    infowindow.setContent(place.name);
+                    infowindow.open(map, this);
+                });
+            }
+
+            function deleteMarkers() {
+                if (markersArray) {
+                    for (i = 0; i < markersArray.length; i++) {
+                        markersArray[i].setMap(null);
+                    }
+                    markersArray.length = 0;
+                }
+            }
+            
+            function myFunction() {
+                //add in vibration function here
+                //alert('Hello');        
+            }
+            
+            function getBusArrival(placeID) {
+                var url= "https://busservices.firebaseio.com/stopsPlaceId/" + placeID + ".json";
+                
+                console.log(url);
+                $.getJSON(url, function(data) {
+                    busStopName = data.name;
+                    stopID = data.stopId; 
+                    $('#busStopName').html(busStopName + ' (' + data.stopId + ')');           
+                    serviceNo = $('#serviceNo').html();
+                    var busTimingUrl = "https://intelbus.herokuapp.com/?id=" + stopID + "&serviceNo=" + serviceNo;
+                    console.log(busTimingUrl);
+                    $.getJSON(busTimingUrl, function(busData) {
+                        if (busData[0].nextBus.duration === 'Arriving'){
+                            responsiveVoice.speak("Your bus is arriving");                    
+                            setTimeout(myFunction, 5000);
+                           
+                            //voice here to read have you boarded the bus?
+                             responsiveVoice.speak("Have you boarded the bus? Double tap to confirm.");  
+                          
+                           
+                            $('#Duration1').html(busData[0].nextBus.duration);
+                        } else {
+                            $('#Duration1').html(busData[0].nextBus.duration + ' Mins');
+                        }
+                        
+                        if (busData[0].subsequentBus.duration === 'Arriving') {
+                            $('#Duration2').html(busData[0].subsequentBus.duration);
+                        } else {
+                            $('#Duration2').html(busData[0].subsequentBus.duration + ' Mins');
+                        }
+                        //$('#Duration3').html(busData[0].subsequentBus3.duration);
+                    });
+
+                    highlightRoute();
+                });
+            }
+
+            function highlightRoute() {
+                // hardcoded 147 route to highlight route on map
+                $.getJSON('<%= image_path ("147route.json") %>', function(routes) {
+                    var polyline = new google.maps.Polyline({
+                        clickable: false,
+                        strokeColor: '#f01b48',
+                        strokeWeight: 8,
+                        strokeOpacity: .8
+                    });
+
+                    var latlngs = [];
+                    var currentStop = false;
+                    for (var i=0, l=routes.length; i<l; i++){
+                        var coord = routes[i];
+                        //hardcode to indicate starting position at SMU SOA bus stop
+                        if (coord === '1.2962224,103.8496698' || currentStop) {
+                            currentStop=true;
+                            var latlng = coord.split(',');
+                            var position = new google.maps.LatLng(parseFloat(latlng[0], 10), parseFloat(latlng[1], 10));
+                            latlngs.push(position);
+                        }
+                    }
+                    polyline.setPath(latlngs);
+                    polyline.setMap(map);
+                });
+            }
+
+            // BOARDED BUS double click event
+            $('body').dblclick(function() {
+                hasBoarded = true;
+                // callGeolocation();
+
+                if (!shakeDetected) {
+                    // find boarding bus stop sequence number
+                    $.getJSON('https://busservices.firebaseio.com/147/route2/stops.json', function(data) {
+                        $.each(data, function(i) {
+                            if(data[i].stopId === stopID) {
+                                sequenceNo = i;
+                            }
+                        });
+                        sequenceNo++;
+
+                        //remove table with bus arrival info
+                        $('#busTiming').remove();
+
+                        //add table to display next bus stop name
+                        $('.table-responsive').append('<table class="table table-hover" id="busStopName">\n\
+                                                    <tr><th width=15%>' + "Bus Onboard: " + '</th><td>' + serviceNo + '</td></tr>\n\
+                                                    <tr id="nextBusStop"><th>' + "Next Bus Stop: " + '</th><td id="nextBusStopCol"></td></tr>\n\
+                                                    </table>');
+                        getBusStopInfo();
+                        sequenceNo++;
+                    });
+                    
+                    simulateMovingBus();
+                }
+            });
+            
+            function simulateMovingBus() {
+                //simulate moving bus by adding timeout of 5 seconds for each increment
+                setTimeout(function () {    
+                    // get next bus stop name
+                    getBusStopInfo();
+                    sequenceNo++;
+                  
+                    
+                    
+                    // for mobile detecting shake event
+                    if (!shakeDetected) {
+                        simulateMovingBus();
+                    }
+
+
+                    // for testing on laptop to stop loop - shake detected
+                    if (sequenceNo === 37) {
+                        shakeDetected = true;
+                    }               
+                }, 10000)
+            }
+            
+                    // eventlistener for shake event to indicate alighting
+                    var shakeEvent = new Shake({threshold: 15});
+                    shakeEvent.start();
+                    window.addEventListener('shake', function () {
+                        shakeDetected = true;
+                        if (hasBoarded && shakeDetected) {
+                            //alert('SHAKE DETECTED ALIGHTED');
+
+                            responsiveVoice.speak('Shake detected. Tap twice to confirm alighting from the bus');
+                         
+                            // play message - confirm alight, tap once for no, tap twice for yes
+                            $('body').dblclick(function () {
+                                //alert('CONFIRM ALIGHTED');
+
+                                responsiveVoice.speak('You have alighted. To end, please close this application. To board another bus, please tap the screen after the vibration.');
+                                if(responsiveVoice.isPlaying()) {
+                                     responsiveVoice.cancel();
+                                }
+                                //redirect to main page
+                                setTimeout(function () {   
+                                   
+                                    window.location.replace("test.html");
+                                }, 3000);
+                            });
+                        }
+                    }, false);  
+            
+
+            function getBusStopInfo() {
+                //get next bus stop name
+                var busStopInfoUrl = 'https://busservices.firebaseio.com/147/route2/stops/' + sequenceNo + '.json';
+                $.getJSON(busStopInfoUrl, function(data) {
+                    var nextBusStop = data.name;
+                    console.log(nextBusStop);
+                    $('#nextBusStopCol').html(nextBusStop);
+                    //if (navigator.vibrate) {
+                      //  navigator.vibrate(1000);
+                    //}
+                    //test for auto play next bus stop name
+                   var text = $('#nextBusStop').text();
+                   if (shakeDetected === false) {
+                    responsiveVoice.speak(text);
+                   }
+                });
+            }
+            
+            // tap once to play bus stop name after onboard the bus
+            $('body').click(function() {
+                if (hasBoarded && !shakeDetected) {
+                    var text = $('#nextBusStop').text();
+                    responsiveVoice.speak(text);
+                    
+                    // for chinese
+                    //responsiveVoice.speak(text, "Chinese Female");
+                }
+            });
+            
+
+        }
+        google.maps.event.addDomListener(window, 'load', initialize);
+        </script>        
+        
+        <script type="text/javascript" src="https://cdn.rawgit.com/alexgibson/shake.js/master/shake.js"></script>
+        <script src='https://code.responsivevoice.org/responsivevoice.js'></script>
+        
+        <script>navigator.vibrate = navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate;</script>
+       <!-- <script src="js/parseJSON.js"></script> -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+    </head>
+    <body>
+        <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="container">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand topnav" href="#">Visually Handicapped Bus app</a>
+                </div>
+                <!--
+                <div>
+                     Lat/Long:<input type= "text" name = "gridbox" id = "grid" disabled>
+                </div>-->
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="#about">About</a>
+                        </li>
+                        <li>
+                            <a href="#services">Settings</a>
+                        </li>
+                        <li>
+                            <a href="#contact">Contact</a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- /.navbar-collapse -->
+            </div>
+            <!-- /.container -->
+        </nav>
+        
+        <div class="container" style="margin-top:51px; height:100%">
+            <div id="map-canvas"></div>
+            <div class="table-responsive">
+                <table class="table table-hover" id="busTiming">
+                    <thead>
+                        <tr>
+                            <th id="busStopName" colspan="3"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>Bus No.</th>
+                            <th>Next Duration</th>
+                            <th>Subsequent Duration</th>
+                           <!--<th>3rd Bus Duration</th>-->
+                        </tr>
+                        <tr id="busArrival">
+                            <td id="serviceNo">147</td>
+                            <td id="Duration1"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span></td>
+                            <td id="Duration2"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span></td>
+                            <!--<td id="Duration3"></td>-->
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </body>
+</html>

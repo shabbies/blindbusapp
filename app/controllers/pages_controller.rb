@@ -22,6 +22,10 @@ class PagesController < ApplicationController
 	def new
 	end
 
+	def test
+
+	end
+
 	def create
 		attachment =  params[:attachment]
 		params = {
@@ -59,25 +63,25 @@ class PagesController < ApplicationController
 						raw_array.each do |number|
 							case number
 							when "one"
-								$number += 1.to_s
+								$number += "1 ".to_s
 							when "two"
-								$number += 2.to_s
+								$number += "2 ".to_s
 							when "three"
-								$number += 3.to_s
+								$number += "3 ".to_s
 							when "four"
-								$number += 4.to_s
+								$number += "4 ".to_s
 							when "five"
-								$number += 5.to_s
+								$number += "5 ".to_s
 							when "six"
-								$number += 6.to_s
+								$number += "6 ".to_s
 							when "seven"
-								$number += 7.to_s
+								$number += "7 ".to_s
 							when "eight"
-								$number += 8.to_s
+								$number += "8 ".to_s
 							when "nine"
-								$number += 9.to_s
+								$number += "9 ".to_s
 							when "zero"
-								$number += 0.to_s
+								$number += "0 ".to_s
 							else
 								$number = "You have entered an invalid choice."
 								break

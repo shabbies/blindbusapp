@@ -4,6 +4,7 @@
   		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 		<script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
+		
 
 		<style>
 			#mainDiv {
@@ -50,14 +51,14 @@
 
 			<div class="row">
 				<div class="col-md-12">
-					<b><font size="6">Bus Number <br/><u><span class="tapValue"><font color="red"><%= $number %></font></span></u></font></b>
+					<b><font size="6">Bus Number <br/><u><span class="tapValue"><font color="red" id="result"><%= $number %></font></span></u></font></b>
 				</div>
 			</div>
 
 		</div>
 	</body>
 </html>
-
+<script src="https://code.responsivevoice.org/responsivevoice.js"></script>
 <script>
 
 	// enable vibration support
@@ -72,7 +73,27 @@
 		}
 		setInterval(blinker, 1000);
 
+		var result = "<%= $number %>";
+		setTimeout(function(){
+			if (result.indexOf("invalid choice") > -1){
+				responsiveVoice.speak("You have entered an invalid choice. Please hold while we redirect you.");
 
+				setTimeout(function(){
+					window.location.replace("/pages/new")
+				}, 5000);
+
+			} else {
+				responsiveVoice.speak("You will be boarding bus " + result + ". Double tap to cancel.");
+				setTimeout(function(){
+					window.location.replace("/pages/test")
+				}, 10000);
+			}
+		}, 2000); 
+
+		$('body').dblclick(function() {
+			window.location.replace("pages/new");
+		});
+		
 	});
 
 
