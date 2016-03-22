@@ -181,12 +181,9 @@
 					//playMandarinAudio();
 				}
 				
+				$("#language").val(tap_list[click]);
 				clearTimeout(timeout);
-				timeout = setTimeout(function()
-			    {
-			        window.location.replace("/pages/bus_number?selected_language=" + tap_list[click]);
-			        
-			    }, 2500);
+				$("#language_form").submit();
 			}//end if tap list is not -
 	});
 
