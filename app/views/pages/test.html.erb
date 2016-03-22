@@ -147,7 +147,7 @@
                     //getBusArrival(place.place_id);
                 }
 
-                var image = '<%= asset_path("nearestbuses.png") %>';
+                var image = '<%= image_url("nearestbuses.png") %>';
                 var marker = new google.maps.Marker({
                     map: map,
                     position: place.geometry.location,
@@ -213,7 +213,7 @@
 
             function highlightRoute() {
                 // hardcoded 147 route to highlight route on map
-                $.getJSON('<%= asset_path ("147route.json") %>', function(routes) {
+                $.getJSON('<%= image_url("147route.json") %>', function(routes) {
                     var polyline = new google.maps.Polyline({
                         clickable: false,
                         strokeColor: '#f01b48',
