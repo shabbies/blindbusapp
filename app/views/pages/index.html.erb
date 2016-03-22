@@ -62,10 +62,12 @@
 
 					<!-- This is for english -->
 					<audio controls id="english-audio-player">
+						<source src="<%= asset_path('English.mp3') %>" type="audio/mpeg">
 					</audio>
 
 					<!-- This is for mandarin -->
 					<audio controls id="mandarin-audio-player">
+						<source src="<%= asset_path('Mandarin.mp3') %>" type="audio/mpeg">
 					</audio>
 
 					<h1>Language Selection <small><i>in process...</i></small></h1>
@@ -244,8 +246,6 @@
     		this.currentTime = 0; // Reset time
 		});
 
-		$('#mandarin-audio-player').html('<source src="assets/Mandarin.mp3" type="audio/mpeg"> Your browser does not support the audio element.');
-
 		var audioPlayer = document.getElementById('mandarin-audio-player');
 		audioPlayer.play();
 	});// end play english audio
@@ -256,8 +256,6 @@
     		this.currentTime = 0; // Reset time
 		});
 
-		$('#mandarin-audio-player').html('<source src="assets/Mandarin.mp3" type="audio/mpeg"> Your browser does not support the audio element.');
-
 		var audioPlayer = document.getElementById('mandarin-audio-player');
 		audioPlayer.play();
 	});// end play english audio
@@ -267,9 +265,6 @@
     		this.pause();
     		this.currentTime = 0; // Reset time
 		});
-
-
-		$('#english-audio-player').html('<source src="assets/English.mp3" type="audio/mpeg"> Your browser does not support the audio element.');
 
 		var audioPlayer = document.getElementById('english-audio-player');
 		audioPlayer.play();
