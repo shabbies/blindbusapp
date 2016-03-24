@@ -1,0 +1,101 @@
+<html>
+	<head>		
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+		<script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
+		
+
+		<style>
+			#mainDiv {
+    			margin-left: 35px;
+    			margin-right: 35px;
+    			text-align: center;
+			}
+
+			#instructionsID ul {
+				display:table; 
+				margin:0 auto;
+			}
+
+			#audio-player {
+				opacity: 0.1; /* This is to make the audio tag transparent/invisible */
+			}
+
+			.btn-big {
+				height: 1000px;
+				width: 800px;
+			}
+		</style>
+	</head>
+	<!--<body onclick="trackNumClick()">-->
+	<body>
+
+		<title>Bus Selection</title>
+		
+		<div id="mainDiv">
+			<div class="row">
+				<div class="page-header col-md-12">
+
+					<audio controls id="audio-player">
+						<!-- change this to suit the occassion-->
+					  	<!-- based on index.html selection, javascript will manipulate this html portion-->
+					</audio>
+
+					<h1>Requesting for Bus Number</h1>
+				</div>
+			</div>
+
+			<br/>
+
+
+			<div class="row">
+				<div class="col-md-12">
+					<b><font size="6">Bus Number <br/><u><span class="tapValue"><font color="red" id="result"><%= $number %></font></span></u></font></b>
+				</div>
+			</div>
+
+		</div>
+	</body>
+</html>
+<script src="https://code.responsivevoice.org/responsivevoice.js"></script>
+<script>
+
+	// enable vibration support
+	navigator.vibrate = navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate;
+
+	$(document).ready(function () {
+    
+
+		function blinker() {
+			$('.blinking').fadeOut(300);
+			$('.blinking').fadeIn(300);
+		}
+		setInterval(blinker, 1000);
+
+		var result = "<%= $number %>";
+		setTimeout(function(){
+			if (result.indexOf("invalid choice") > -1){
+				responsiveVoice.speak("You have entered an invalid choice. Please hold while we redirect you.");
+
+				setTimeout(function(){
+					window.location.replace("/pages/new")
+				}, 5000);
+
+			} else {
+				responsiveVoice.speak("You will be boarding bus " + result + ". Double tap to cancel.");
+				setTimeout(function(){
+					window.location.replace("/pages/test")
+				}, 10000);
+			}
+		}, 2000); 
+
+		$('body').dblclick(function() {
+			window.location.replace("pages/new");
+		});
+		
+	});
+
+
+
+</script>

@@ -3,9 +3,10 @@ Rails.application.routes.draw do
   root 'pages#new'
 
   resource :pages do
-    get 'home' => :home
+    get 'console' => :console
     get 'help' => :help
     get 'test' => :test
+    get 'number' => :number
   end
 
   # The priority is based upon order of creation: first created -> highest priority.

@@ -6,8 +6,9 @@ require 'uri'
 require 'net/http'
 
 class PagesController < ApplicationController
+	skip_before_action :verify_authenticity_token
 
-	def home
+	def console
 
 	end
 
@@ -15,7 +16,7 @@ class PagesController < ApplicationController
 
 	end
 
-	def bus_number
+	def number
 
 	end
 
