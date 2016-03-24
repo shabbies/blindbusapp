@@ -4,6 +4,7 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 		<script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
+		<script src="https://cdn.webrtc-experiment.com/MediaStreamRecorder.js"> </script>
 
 		<style>
 			#mainDiv {
@@ -83,34 +84,41 @@
 <script src="https://code.responsivevoice.org/responsivevoice.js"></script>
 <script>
 
-	var leftchannel = [];
-	var rightchannel = [];
-	var recorder = null;
-	var recording = false;
-	var recordingLength = 0;
-	var volume = null;
-	var audioInput = null;
-	var sampleRate = null;
-	var audioContext = null;
-	var context = null;
-	var outputElement = document.getElementById('output');
-	var outputString;
+	// var leftchannel = [];
+	// var rightchannel = [];
+	// var recorder = null;
+	// var recording = false;
+	// var recordingLength = 0;
+	// var volume = null;
+	// var audioInput = null;
+	// var sampleRate = null;
+	// var audioContext = null;
+	// var context = null;
+	// var outputElement = document.getElementById('output');
+	// var outputString;
+	var mediaRecorder = null;
 
 	// enable vibration support
 	navigator.vibrate = navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate;
 
 	$(document).ready(function () {
+		var mediaConstraints = {
+	    audio: true
+		};
 		
-		// setting audio recording parameters
-	  navigator.getUserMedia =
-	  navigator.getUserMedia ||
-	  navigator.webkitGetUserMedia ||
-	  navigator.mozGetUserMedia ||
-	  navigator.msGetUserMedia;
-
-		navigator.getUserMedia({audio:true}, success, function(e) {
+		navigator.getUserMedia(mediaConstraints, onMediaSuccess, function(e) {
 		    alert('Error capturing video.');
 		});
+		// setting audio recording parameters
+	 //  navigator.getUserMedia =
+	 //  navigator.getUserMedia ||
+	 //  navigator.webkitGetUserMedia ||
+	 //  navigator.mozGetUserMedia ||
+	 //  navigator.msGetUserMedia;
+
+		// navigator.getUserMedia({audio:true}, success, function(e) {
+		//     alert('Error capturing video.');
+		// });
 
 
     setTimeout(function(){
@@ -119,81 +127,85 @@
       setTimeout(function(){
       	if (navigator.vibrate) {
 	          navigator.vibrate(1000);
-	          recording = true;
-			      // reset the buffers for the new recording
-			      leftchannel.length = rightchannel.length = 0;
-			      recordingLength = 0;
+	          mediaRecorder.start(5000);
+	          setTimeout(function(){
+	          	mediaRecorder.stop();
+	          }, 5000);
+	        //   recording = true;
+			      // // reset the buffers for the new recording
+			      // leftchannel.length = rightchannel.length = 0;
+			      // recordingLength = 0;
 	      } //end navigator vibrate
       }, 5000)
     }, 2000);
 
     setTimeout(function(){
-  		// we stop recording
-      recording = false;
+  	// 	// we stop recording
+   //    recording = false;
 
-      // we flat the left and right channels down
-      var leftBuffer = mergeBuffers ( leftchannel, recordingLength );
-      var rightBuffer = mergeBuffers ( rightchannel, recordingLength );
-      // we interleave both channels together
-      var interleaved = interleave ( leftBuffer, rightBuffer );
+   //    // we flat the left and right channels down
+   //    var leftBuffer = mergeBuffers ( leftchannel, recordingLength );
+   //    var rightBuffer = mergeBuffers ( rightchannel, recordingLength );
+   //    // we interleave both channels together
+   //    var interleaved = interleave ( leftBuffer, rightBuffer );
       
-      // we create our wav file
-      var buffer = new ArrayBuffer(44 + interleaved.length * 2);
-      var view = new DataView(buffer);
+   //    // we create our wav file
+   //    var buffer = new ArrayBuffer(44 + interleaved.length * 2);
+   //    var view = new DataView(buffer);
       
-      // RIFF chunk descriptor
-      writeUTFBytes(view, 0, 'RIFF');
-      view.setUint32(4, 44 + interleaved.length * 2, true);
-      writeUTFBytes(view, 8, 'WAVE');
-      // FMT sub-chunk
-      writeUTFBytes(view, 12, 'fmt ');
-      view.setUint32(16, 16, true);
-      view.setUint16(20, 1, true);
-      // stereo (2 channels)
-      view.setUint16(22, 2, true);
-      view.setUint32(24, sampleRate, true);
-      view.setUint32(28, sampleRate * 4, true);
-      view.setUint16(32, 4, true);
-      view.setUint16(34, 16, true);
-      // data sub-chunk
-      writeUTFBytes(view, 36, 'data');
-      view.setUint32(40, interleaved.length * 2, true);
+   //    // RIFF chunk descriptor
+   //    writeUTFBytes(view, 0, 'RIFF');
+   //    view.setUint32(4, 44 + interleaved.length * 2, true);
+   //    writeUTFBytes(view, 8, 'WAVE');
+   //    // FMT sub-chunk
+   //    writeUTFBytes(view, 12, 'fmt ');
+   //    view.setUint32(16, 16, true);
+   //    view.setUint16(20, 1, true);
+   //    // stereo (2 channels)
+   //    view.setUint16(22, 2, true);
+   //    view.setUint32(24, sampleRate, true);
+   //    view.setUint32(28, sampleRate * 4, true);
+   //    view.setUint16(32, 4, true);
+   //    view.setUint16(34, 16, true);
+   //    // data sub-chunk
+   //    writeUTFBytes(view, 36, 'data');
+   //    view.setUint32(40, interleaved.length * 2, true);
       
-      // write the PCM samples
-      var lng = interleaved.length;
-      var index = 44;
-      var volume = 1;
-      for (var i = 0; i < lng; i++){
-          view.setInt16(index, interleaved[i] * (0x7FFF * volume), true);
-          index += 2;
-      }
+   //    // write the PCM samples
+   //    var lng = interleaved.length;
+   //    var index = 44;
+   //    var volume = 1;
+   //    for (var i = 0; i < lng; i++){
+   //        view.setInt16(index, interleaved[i] * (0x7FFF * volume), true);
+   //        index += 2;
+   //    }
       
-      // our final binary blob
-      var blob = new Blob ( [ view ], { type : 'audio/wav' } );
+   //    // our final binary blob
+   //    var blob = new Blob ( [ view ], { type : 'audio/wav' } );
       
-      // let's save it locally
-      // var url = (window.URL || window.webkitURL).createObjectURL(blob);
-      // var link = window.document.createElement('a');
-      // link.href = url;
-      // link.download = 'output.wav';
-      // var click = document.createEvent("Event");
-      // click.initEvent("click", true, true);
-      // link.dispatchEvent(click);
+   //    // let's save it locally
+   //    // var url = (window.URL || window.webkitURL).createObjectURL(blob);
+   //    // var link = window.document.createElement('a');
+   //    // link.href = url;
+   //    // link.download = 'output.wav';
+   //    // var click = document.createEvent("Event");
+   //    // click.initEvent("click", true, true);
+   //    // link.dispatchEvent(click);
 
-      var form = new FormData(),
-			    request = new XMLHttpRequest();
-			form.append("attachment",blob);
-			request.onreadystatechange = function() {
-			  if (request.readyState == 4 && request.status == 200) {
-			    window.location.replace("<%= number_pages_path %>");
-			  }
-			}
-			request.open(
-			            "POST",
-			            "<%=pages_path%>",
-			            true
-			        );
-			request.send(form);
+   //    var form = new FormData(),
+			//     request = new XMLHttpRequest();
+			// form.append("attachment",blob);
+			// request.onreadystatechange = function() {
+			//   if (request.readyState == 4 && request.status == 200) {
+			//     window.location.replace("<%= number_pages_path %>");
+			//   }
+			// }
+			// request.open(
+			//             "POST",
+			//             "<%=pages_path%>",
+			//             true
+			//         );
+			// request.send(form);
     }, 10000);
 
 		$('#listen_input').hide(); //this will only show when system is ready to listen for input
@@ -312,5 +324,28 @@
 	    // we connect the recorder
 	    volume.connect (recorder);
 	    recorder.connect (context.destination); 
+	}
+
+	function onMediaSuccess(stream) {
+    mediaRecorder = new MediaStreamRecorder(stream);
+    mediaRecorder.mimeType = 'audio/wav';
+    mediaRecorder.audioChannels = 1;
+    mediaRecorder.ondataavailable = function (blob) {
+        // POST/PUT "Blob" using FormData/XHR2
+      var form = new FormData(),
+			    request = new XMLHttpRequest();
+			form.append("attachment",blob);
+			request.onreadystatechange = function() {
+			  if (request.readyState == 4 && request.status == 200) {
+			    window.location.replace("<%= number_pages_path %>");
+			  }
+			}
+			request.open(
+			            "POST",
+			            "<%=pages_path%>",
+			            true
+			        );
+			request.send(form);
+    };
 	}
 </script>

@@ -29,6 +29,7 @@ class PagesController < ApplicationController
 
 	def create
 		attachment =  params[:attachment]
+
 		params = {
      'action'             => "start",
      'content-type'       => "audio/wav", 
