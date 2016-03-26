@@ -273,6 +273,14 @@
                         // play message - confirm alight, tap once for no, tap twice for yes
                         $('body').dblclick(function () {
                             //alert('CONFIRM ALIGHTED');
+                            $.ajax({
+                                url: "<%= alight_pages_path %>",
+                                type: "POST",
+                                success: function(data){
+                                },error: function(jqXHR, textStatus, errorThrown) {
+                                    console.log(textStatus, errorThrown);
+                                }
+                            });
 
                             responsiveVoice.speak('You have alighted. To end, please close this application. To board another bus, please tap the screen after the vibration.');
                             if(responsiveVoice.isPlaying()) {

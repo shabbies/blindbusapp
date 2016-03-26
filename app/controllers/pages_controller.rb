@@ -9,6 +9,7 @@ class PagesController < ApplicationController
 	skip_before_action :verify_authenticity_token
 	$bus_stop = ["07571", "04189", "04159", "04149", "04229", "04239", "05059", "05049", "05039"]
 	$counter = 0
+	$alighting = false
 
 	def board
 		bus_stop_id = params[:stop_id].split("(")[1][0..4]
@@ -41,7 +42,14 @@ class PagesController < ApplicationController
 
 	end
 
+	def alight
+		$alighting = true
+	end
+
 	def blind_man_number
+		if (!$blindman)
+			$blindman = Hash.new
+		end
 		stop_id = $bus_stop[$counter]
 		$counter += 1
 		if $counter >= $bus_stop.length
@@ -54,7 +62,9 @@ class PagesController < ApplicationController
 		var = Hash.new
 		var["stop_id"] = stop_id.to_s
 		var["count"] = blindman_count.to_s
+		var["alighting"] = $alighting
 		p var
+		$alighting = false
 		render json: var
 	end
 
