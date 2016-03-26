@@ -151,7 +151,6 @@
 			            //bus stop ID is stopID
 			            stopID = data.stopId;
 			            //console.log(stopID);   
-			            var busNo = "<%= $number.gsub!(' ', '') %>";
 					        url= "https://intelbus.herokuapp.com/?id=" + stopID + "&serviceNo=" + busNo;        
 					        console.log(url);
 					        $.getJSON(url, function(data) {
@@ -189,7 +188,7 @@
 		}, 2000); 
 
 		$('body').dblclick(function() {
-			window.location.replace("pages/new");
+			window.location.replace("/pages/new");
 		});
 		
 	});
