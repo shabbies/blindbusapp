@@ -7,6 +7,8 @@ Rails.application.routes.draw do
     get 'help' => :help
     get 'test' => :test
     get 'number' => :number
+    post 'board' => :board
+    post 'blind_man_number'
   end
 
   # The priority is based upon order of creation: first created -> highest priority.

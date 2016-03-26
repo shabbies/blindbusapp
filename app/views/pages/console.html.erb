@@ -5,6 +5,23 @@
 		<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 	</head>
 
+	<style>
+		.arriving{
+			background-color: #FFF8C6;
+		}
+
+		.arriving font{
+			color: #000000;
+		}
+
+		.away{
+			background-color: #E6E6E6;
+		}
+
+		.away font{
+			color: #A4A4A4;
+		}
+	</style>
 	<body>
 
 		<title>Bus Console</title>
@@ -21,49 +38,49 @@
 				<div class="table-responsive">
 					<table class="table table-bordered">
 
-						<tr><td align="center">
-							<b>Bus Stop ID:</b> 07571 <br/>
-							<b>Bus Stop Name:</b> Opp Prime Ctr
+						<tr><td align="center" id="07571" class="away">
+							<font><b>Bus Stop ID:</b> 07571 <br/>
+							<b>Bus Stop Name:</b> Opp Prime Ctr</font>
 						</td></tr>
 
-						<tr bgcolor="#E6E6E6"><td align="center">
-							<font color="#A4A4A4"><b>Bus Stop ID:</b> 04189 <br/>
+						<tr><td align="center" id="04189" class="away">
+							<font><b>Bus Stop ID:</b> 04189 <br/>
 							<b>Bus Stop Name:</b> Manulife Ctr</font>
 						</td></tr>
 
-						<tr bgcolor="#E6E6E6"><td align="center">
-							<font color="#A4A4A4"><b>Bus Stop ID:</b> 04179 <br/>
-							<b>Bus Stop Name:</b> NTUC Income Ctr</font>
+						<tr><td align="center" id="04159" class="away">
+							<font><b>Bus Stop ID:</b> 04159 <br/>
+							<b>Bus Stop Name:</b> Aft Chijmes</font>
 						</td></tr>
 
-						<tr bgcolor="#E6E6E6"><td align="center">
-							<font color="#A4A4A4"><b>Bus Stop ID:</b> 02049 <br/>
-							<b>Bus Stop Name:</b> Raffles Hotel</font>
+						<tr><td align="center" id="04149" class="away">
+							<font><b>Bus Stop ID:</b> 04149 <br/>
+							<b>Bus Stop Name:</b> Grand Park City Hall</font>
 						</td></tr>
 
-						<tr bgcolor="#E6E6E6"><td align="center">
-							<font color="#A4A4A4"><b>Bus Stop ID:</b> 40019 <br/>
-							<b>Bus Stop Name:</b> Opp  Singapore Cricket Club</font>
+						<tr><td align="center" id="04229" class="away">
+							<font><b>Bus Stop ID:</b> 04229 <br/>
+							<b>Bus Stop Name:</b> High St Ctr</font>
 						</td></tr>
 
-						<tr bgcolor="#E6E6E6"><td align="center">
-							<font color="#A4A4A4"><b>Bus Stop ID:</b> 07539 <br/>
-							<b>Bus Stop Name:</b> OUE Bayfront</font>
+						<tr><td align="center" id="04239" class="away">
+							<font><b>Bus Stop ID:</b> 04239 <br/>
+							<b>Bus Stop Name:</b> Clarke Quay Station</font>
 						</td></tr>
 
-						<tr bgcolor="#E6E6E6"><td align="center">
-							<font color="#A4A4A4"><b>Bus Stop ID:</b> 07517 <br/>
-							<b>Bus Stop Name:</b> One Raffles Quay</font>
+						<tr><td align="center" id="05059" class="away">
+							<font><b>Bus Stop ID:</b> 05059 <br/>
+							<b>Bus Stop Name:</b> Hong Lim Pk</font>
 						</td></tr>
 
-						<tr bgcolor="#E6E6E6"><td align="center">
-							<font color="#A4A4A4"><b>Bus Stop ID:</b> 05417 <br/>
-							<b>Bus Stop Name:</b> UIC Bldg</font>
+						<tr><td align="center" id="05049" class="away">
+							<font><b>Bus Stop ID:</b> 05049 <br/>
+							<b>Bus Stop Name:</b> Chinatown Pt</font>
 						</td></tr>
 
-						<tr bgcolor="#E6E6E6"><td align="center">
-							<font color="#A4A4A4"><b>Bus Stop ID:</b> 07237 <br/>
-							<b>Bus Stop Name:</b>Opp AXA Tower</font>
+						<tr><td align="center" id="05039" class="away">
+							<font><b>Bus Stop ID:</b> 05039 <br/>
+							<b>Bus Stop Name:</b> New Bridge Ctr</font>
 						</td></tr>
 
 					</table>
@@ -78,7 +95,7 @@
 					</div>
 
 					<div>
-						<center><u><font size="10">0</font></u></center>
+						<center><u><font size="10" id="number">0</font></u></center>
 					</div>
 
 				</div>
@@ -92,5 +109,27 @@
 
 
 	</body>
+
+	<script>
+		$(document).ready(function(){
+			$.ajax({
+        url: "<%= blind_man_number_pages_path %>",
+        type: "POST",
+        dataType: "json",
+        success: function(data){
+        	$("#" + data.stop_id).addClass("arriving");
+        	$("#" + data.stop_id).removeClass("away");
+        	$("#number").val(data.count);
+        },error: function(jqXHR, textStatus, errorThrown) {
+			  	console.log(textStatus, errorThrown);
+				}
+    	});
+
+    	setTimeout(function(){
+    		location.reload();
+    	}, 5000);
+		})
+		
+	</script>
 
 </html>
