@@ -145,6 +145,7 @@
                         var busTimingUrl = "https://intelbus.herokuapp.com/?id=" + stopID + "&serviceNo=" + serviceNo;
                         console.log(busTimingUrl);
                         $.getJSON(busTimingUrl, function(busData) {
+                            busData[0].nextBus.duration = 'Arriving';
                             if (busData[0].nextBus.duration === 'Arriving'){
                                 responsiveVoice.speak("Your bus is arriving");                    
                                 setTimeout(myFunction, 5000);
