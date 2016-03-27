@@ -143,7 +143,7 @@
       function callback(results, status) {
           if (status === google.maps.places.PlacesServiceStatus.OK) {
               //for (var i = 0; i < results.length; i++) {
-              	console.log(results[0].place_id);
+            	console.log(results[0].place_id);
               var url= "https://busservices.firebaseio.com/stopsPlaceId/" + results[0].place_id + ".json";        
 			        console.log(url);
 			        $.getJSON(url, function(data) {

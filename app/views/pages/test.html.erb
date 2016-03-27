@@ -24,6 +24,7 @@
             var hasBoarded = false;
             var shakeDetected = false;
             var serviceNo, stopID, sequenceNo, busStopName;
+            var firstMarker = true;
 
             function initialize() {
                 geocoder = new google.maps.Geocoder();
@@ -86,10 +87,10 @@
                 }
 
                 function callback(results, status) {
-                    if (status === google.maps.places.PlacesServiceStatus.OK) {
-                        //for (var i = 0; i < results.length; i++) {
-                            createMarker(results[i]);
-                        //}
+                    if (status === google.maps.places.PlacesServiceStatus.OK && firstMarker) {
+                        console.log(i);
+                        createMarker(results[0]);
+                        firstMarker = false;
                     }
                 }
 
@@ -171,7 +172,7 @@
                         highlightRoute(serviceNo, latlng);
 
                         $.ajax({
-                            url: "<%= board_pages_path %>",
+                            url: "<%= waiting_pages_path %>",
                             type: "POST",
                             data: {'stop_id': $("#busStopName").html()},
                             success: function(data){
@@ -209,6 +210,16 @@
                 // BOARDED BUS double click event
                 $('body').dblclick(function() {
                     // callGeolocation();
+
+                    $.ajax({
+                        url: "<%= board_pages_path %>",
+                        type: "POST",
+                        data: {'stop_id': $("#busStopName").html()},
+                        success: function(data){
+                        },error: function(jqXHR, textStatus, errorThrown) {
+                            console.log(textStatus, errorThrown);
+                        }
+                    });
 
                     if (!shakeDetected) {
                         // find boarding bus stop sequence number

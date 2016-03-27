@@ -13,6 +13,13 @@ class PagesController < ApplicationController
 
 	def board
 		bus_stop_id = params[:stop_id].split("(")[1][0..4]
+		if $blindman[bus_stop_id]
+			$blindman[bus_stop_id] -= 1
+		end
+	end
+
+	def waiting
+		bus_stop_id = params[:stop_id].split("(")[1][0..4]
 		if (!$blindman)
 			$blindman = Hash.new
 		end

@@ -135,7 +135,7 @@
         success: function(data){
         	$("#" + data.stop_id).addClass("arriving");
         	$("#" + data.stop_id).removeClass("away");
-        	$("#number").val(data.count);
+        	$("#number").html(data.count);
         	if (data.alighting){
         		$("#myModal").modal('show');
         	}
@@ -143,10 +143,6 @@
 			  	console.log(textStatus, errorThrown);
 				}
     	});
-
-    	setTimeout(function(){
-    		location.reload();
-    	}, 10000);
 		})
 		
 	</script>

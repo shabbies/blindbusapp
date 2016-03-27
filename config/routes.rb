@@ -10,6 +10,7 @@ Rails.application.routes.draw do
     post 'board' => :board
     post 'blind_man_number'
     post 'alight'
+    post 'waiting'
   end
 
   # The priority is based upon order of creation: first created -> highest priority.
