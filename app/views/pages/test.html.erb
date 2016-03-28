@@ -25,6 +25,7 @@
             var shakeDetected = false;
             var serviceNo, stopID, sequenceNo, busStopName;
             var firstMarker = true;
+            var firstStop = true;
 
             function initialize() {
                 geocoder = new google.maps.Geocoder();
@@ -244,9 +245,6 @@
                                                             </table>');
                                 hasBoarded = true;
                             }
-                            setTimeout(function (){
-
-                            }, 3000);
                             getBusStopInfo();
                             sequenceNo++;
                         });
@@ -326,7 +324,14 @@
                         //test for auto play next bus stop name
                        var text = $('#nextBusStop').text();
                        if (shakeDetected === false) {
-                        responsiveVoice.speak(text);
+                            if (firstStop){
+                                setTimeout(function(){
+                                    responsiveVoice.speak(text);
+                                }, 3000);
+                                firstStop = false;
+                            } else {
+                                responsiveVoice.speak(text);
+                            }
                        }
                     });
                 }
@@ -335,6 +340,7 @@
                 $('body').click(function() {
                     if (hasBoarded && !shakeDetected) {
                         var text = $('#nextBusStop').text();
+
                         responsiveVoice.speak(text);
                         
                         // for chinese
