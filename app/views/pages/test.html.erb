@@ -216,11 +216,12 @@
                         type: "POST",
                         data: {'stop_id': $("#busStopName").html()},
                         success: function(data){
+                            responsiveVoice.speak("You have boarded the bus. Please shake to alight");  
                         },error: function(jqXHR, textStatus, errorThrown) {
                             console.log(textStatus, errorThrown);
                         }
                     });
-                    responsiveVoice.speak("You have boarded the bus. Please shake to alight");  
+                    
 
                     if (!shakeDetected) {
                         // find boarding bus stop sequence number
@@ -290,12 +291,12 @@
                                 url: "<%= alight_pages_path %>",
                                 type: "POST",
                                 success: function(data){
+                                    responsiveVoice.speak('You will be alighting at the next stop, to end please close the app.');
                                 },error: function(jqXHR, textStatus, errorThrown) {
                                     console.log(textStatus, errorThrown);
                                 }
                             });
 
-                            responsiveVoice.speak('You will be alighting at the next stop, to end please close the app.');
                             if(responsiveVoice.isPlaying()) {
                                  responsiveVoice.cancel();
                             }
