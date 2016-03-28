@@ -244,13 +244,12 @@
                                                             </table>');
                                 hasBoarded = true;
                             }
+                            setTimeout(function (){
+
+                            }, 3000);
                             getBusStopInfo();
                             sequenceNo++;
                         });
-                        
-                        setTimeout(function (){
-
-                        }, 5000);
                         simulateMovingBus(serviceNo);
                     }
                 });
