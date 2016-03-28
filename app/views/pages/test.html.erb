@@ -220,6 +220,7 @@
                             console.log(textStatus, errorThrown);
                         }
                     });
+                    responsiveVoice.speak("You have boarded the bus. Please shake to alight");  
 
                     if (!shakeDetected) {
                         // find boarding bus stop sequence number
@@ -294,7 +295,7 @@
                                 }
                             });
 
-                            responsiveVoice.speak('You have alighted. To end, please close this application. To board another bus, please tap the screen after the vibration.');
+                            responsiveVoice.speak('You will be alighting at the next stop, to end please close the app.');
                             if(responsiveVoice.isPlaying()) {
                                  responsiveVoice.cancel();
                             }
